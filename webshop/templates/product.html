@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    {{object.name}}
+    <form method="get" action="{% url 'update-product' object.id%}">
+        <input type="submit" value="To edit">
+    </form>
+    <form method="post" action="{% url 'add-purchase' %}">
+        {% csrf_token %}
+        {{form}}
+        <input type="hidden" name="product" value="object.id">
+        <input type="submit" value="Buy">
+    </form>
+</div>
+{% endblock %}

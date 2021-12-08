@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    {% for obj in object_list %}
+    <div>
+        {{ obj.purchase.product.name }}
+        {{ obj.purchase.product.price }}
+
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

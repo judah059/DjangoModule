@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <a href="{% url 'add-product' %}">Add product</a>
+    {% for obj in object_list %}
+    <form method="get" action="{% url 'detail-product' obj.id %}">
+        <input type="submit" value="{{obj.name}}">
+        {{obj.price}}$
+    </form>
+    {% endfor %}
+</div>
+{% endblock %}
