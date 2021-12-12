@@ -21,8 +21,11 @@ class Purchase(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
 
+
 class Return(models.Model):
     purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE, related_name='returns')
+    reason = models.CharField(max_length=120, null=True, blank=True)
     request_time = models.TimeField(auto_now=True)
+
 
 # Create your models here.

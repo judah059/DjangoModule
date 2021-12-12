@@ -6,7 +6,16 @@
     <div>
         {{ obj.purchase.product.name }}
         {{ obj.purchase.product.price }}
-
+        {%if request.user.is_superuser%}
+        <form method="post" action="{% url 'purchase-delete' obj.purchase.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Confirm">
+        </form>
+        <form method="post" action="{% url 'return-delete' obj.id %}">
+            {% csrf_token %}
+            <input type="submit" value="Reject">
+        </form>
+        {% endif %}
     </div>
     {% endfor %}
 </div>
