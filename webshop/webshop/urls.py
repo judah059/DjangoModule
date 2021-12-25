@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path
 from webapp.views import Login, Register, AddProductView, ProductView, DetailProductView, UpdateProductView, ReturnView, Logout, PurchaseView, PurchaseDelete, ReturnDelete
+from rest_framework.authtoken import views
+
+from webapp.API.resources import CustomAuthToken
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +17,8 @@ urlpatterns = [
     path('update/<int:pk>/', UpdateProductView.as_view(), name='update-product'),
     path('return/', ReturnView.as_view(), name='return'),
     path('purchase/list/', PurchaseView.as_view(), name='purchase'),
-    path('return/delete/<int:pk>/', ReturnDelete.as_view(), name='return-delete')
+    path('return/delete/<int:pk>/', ReturnDelete.as_view(), name='return-delete'),
+    path('api-token-auth/', CustomAuthToken.as_view())
+
 
 ]
