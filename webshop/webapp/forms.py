@@ -2,6 +2,7 @@ from django import forms
 import datetime
 from django.forms import ModelForm
 from .models import Purchase, Product, MyUser, Return
+from django.contrib.auth.forms import UserCreationForm
 
 
 class AddProductForm(ModelForm):
@@ -23,36 +24,53 @@ class AddProductForm(ModelForm):
             self.add_error('name', 'This product already has added')
 
 
-# class AddReturnForm(ModelForm):
-#     class Meta:
-#         model = Return
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         purchase = cleaned_data.get('purchase')
-#         diff = datetime.datetime.now() - purchase.created_at
-#         if diff.total_seconds() > 180:
-#             self.add_error('purchase', 'Sorry, you can`t return this product')
+class AddReturnForm(ModelForm):
+    class Meta:
+        model = Return
+        fields = ['reason']
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(AddReturnForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        purchase_id = self.request.POST.get('purchase')
+        purchase = Purchase.objects.get(id=purchase_id)
+        duration = datetime.datetime.now(datetime.timezone.utc) - purchase.created_at
+        if Return.objects.filter(purchase=purchase):
+            self.add_error(None, 'You has already tried to return')
+        elif duration.total_seconds() > 180:
+            self.add_error(None, 'Time for return is over. You could return in 180 seconds')
 
 
 class AddPurchaseForm(ModelForm):
 
     class Meta:
         model = Purchase
-        fields = ['product', 'purchase_product_count']
+        fields = ['purchase_product_count']
 
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     purchase_product_count = cleaned_data.get('purchase_product_count')
-    #     product = cleaned_data.get('product')
-    #     # sum_ = product.price * purchase_product_count
-    #     # my_user = cleaned_data.get('user')
-    #     # if sum_ > my_user.wallet:
-    #     #     self.add_error('product_count', 'You don`t have enough money')
-    #     if product.product_count == 0:
-    #         self.add_error('product_count', 'Sorry product is over')
-    #     if purchase_product_count > product.product_count:
-    #         self.add_error('product_count', 'Not enough products')
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(AddPurchaseForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        purchase_product_count = cleaned_data.get('purchase_product_count')
+        product_id = self.request.POST.get('product')
+        product = Product.objects.get(id=product_id)
+        sum_ = product.price * purchase_product_count
+        my_user = self.request.user
+        if sum_ > my_user.wallet:
+            self.add_error('purchase_product_count', 'You don`t have enough money')
+        if purchase_product_count > product.product_count:
+            self.add_error('purchase_product_count', 'Not enough products')
+        elif purchase_product_count <= 0:
+            self.add_error('purchase_product_count', 'Please select one or more products')
 
 
+class MyUserCreationForm(UserCreationForm):
+    class Meta:
+        model = MyUser
+        fields = ("username",)
 

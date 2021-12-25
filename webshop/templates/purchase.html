@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <a href="{% url 'main' %}"> To main page</a>
+    {% for obj in object_list %}
+    <div>
+        <form method="post" action="{% url 'purchase' %}">
+            {% csrf_token %}
+            {{ obj.product.name }}
+            {{ obj.purchase_product_count }}
+            {{ obj.created_at }}
+            {{form}}
+            <input type="hidden" name="purchase" value="{{obj.id}}">
+            <input type="submit" value="Return">
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

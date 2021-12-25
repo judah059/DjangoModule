@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<a href="{% url 'main' %}">To main page</a>
 <div>
     <form method="post" action="{% url 'add-product' %}">
         {% csrf_token %}
